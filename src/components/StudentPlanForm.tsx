@@ -39,10 +39,11 @@ const StudentPlanForm = () => {
     planDays: "",
   });
 
-  const [n8nConfig, setN8nConfig] = useState<N8nConfig>({
+  // إعدادات n8n مخزنة مباشرة في الكود
+  const n8nConfig: N8nConfig = {
     webhookUrl: "https://n8n.jadallah.work/webhook-test/get-form-data",
     dataWebhookUrl: "https://n8n.jadallah.work/webhook/get-data-form",
-  });
+  };
 
   const [groups, setGroups] = useState<string[]>([]);
   const [planTypes, setPlanTypes] = useState<string[]>([]);
@@ -206,76 +207,103 @@ const StudentPlanForm = () => {
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="flex justify-center mb-4">
-            <div className="p-4 bg-primary/10 rounded-2xl">
-              <FileText className="w-12 h-12 text-primary" />
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* Header with gradient background */}
+        <div className="text-center space-y-4 py-12 relative overflow-hidden">
+          <div className="absolute inset-0 gradient-primary opacity-5 rounded-3xl"></div>
+          <div className="relative">
+            <div className="flex justify-center mb-6">
+              <div className="p-5 gradient-primary rounded-3xl shadow-elegant animate-in fade-in duration-500">
+                <FileText className="w-16 h-16 text-primary-foreground" />
+              </div>
             </div>
+            <h1 className="text-5xl font-bold gradient-primary bg-clip-text text-transparent mb-3 animate-in slide-in-from-bottom-4 duration-700">
+              نظام إدارة خطط الطلاب
+            </h1>
+            <p className="text-muted-foreground text-xl max-w-2xl mx-auto animate-in slide-in-from-bottom-4 duration-700 delay-100">
+              نظام متكامل وآلي لإدارة وتوزيع خطط الطلاب بكفاءة عالية
+            </p>
           </div>
-          <h1 className="text-4xl font-bold gradient-primary bg-clip-text text-transparent">
-            نظام إدارة خطط الطلاب
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            نظام متكامل لإدارة خطط الطلاب مع الربط المباشر بـ n8n
-          </p>
         </div>
 
-        {/* n8n Configuration Card */}
-        <Card className="p-6 shadow-card">
-          <h2 className="text-xl font-bold mb-4 text-primary flex items-center gap-2">
-            <span className="w-2 h-2 bg-primary rounded-full"></span>
-            إعدادات n8n
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="webhookUrl" className="text-base">
-                رابط Webhook للبيانات (الحصول على القوائم)
-              </Label>
-              <Input
-                id="webhookUrl"
-                type="url"
-                placeholder="https://your-n8n-instance.com/webhook/get-data"
-                value={n8nConfig.webhookUrl}
-                onChange={(e) =>
-                  setN8nConfig({ ...n8nConfig, webhookUrl: e.target.value })
-                }
-                className="mt-2"
-                dir="ltr"
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                هذا الـ webhook يستخدم لجلب بيانات المجموعات والخطط من Google Sheets
-              </p>
+        {/* Instructions Card - Enhanced */}
+        <Card className="p-8 gradient-card border-2 border-primary/10 shadow-elegant">
+          <div className="flex items-start gap-4 mb-6">
+            <div className="p-3 bg-primary/10 rounded-xl">
+              <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
-            <div>
-              <Label htmlFor="dataWebhookUrl" className="text-base">
-                رابط Webhook لإرسال البيانات
-              </Label>
-              <Input
-                id="dataWebhookUrl"
-                type="url"
-                placeholder="https://your-n8n-instance.com/webhook/submit-data"
-                value={n8nConfig.dataWebhookUrl}
-                onChange={(e) =>
-                  setN8nConfig({ ...n8nConfig, dataWebhookUrl: e.target.value })
-                }
-                className="mt-2"
-                dir="ltr"
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                هذا الـ webhook يستخدم لإرسال بيانات النموذج عند الضغط على إرسال
-              </p>
+            <div className="flex-1">
+              <h3 className="font-bold text-2xl mb-4 text-primary">كيفية استخدام النظام</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">1</span>
+                    <p className="text-muted-foreground leading-relaxed">
+                      <strong className="text-foreground">اختر المجموعة:</strong> سيتم تحميل المجموعات تلقائياً من Google Sheets
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">2</span>
+                    <p className="text-muted-foreground leading-relaxed">
+                      <strong className="text-foreground">نوع الخطة:</strong> اختر نوع الخطة المناسبة للطالب
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">3</span>
+                    <p className="text-muted-foreground leading-relaxed">
+                      <strong className="text-foreground">عنصر الخطة:</strong> حدد العنصر المطلوب من القائمة
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">4</span>
+                    <p className="text-muted-foreground leading-relaxed">
+                      <strong className="text-foreground">أيام الدراسة:</strong> اختر اليومين المخصصين للطالب
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">5</span>
+                    <p className="text-muted-foreground leading-relaxed">
+                      <strong className="text-foreground">تاريخ البدء:</strong> حدد تاريخ بداية تنفيذ الخطة
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">6</span>
+                    <p className="text-muted-foreground leading-relaxed">
+                      <strong className="text-foreground">إرسال:</strong> اضغط على زر الإرسال لحفظ البيانات
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+          
+          {/* Loading Indicator */}
+          {isLoadingData && (
+            <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-lg flex items-center gap-3">
+              <Loader2 className="w-5 h-5 text-primary animate-spin" />
+              <span className="text-sm text-muted-foreground">جاري تحميل البيانات من Google Sheets...</span>
+            </div>
+          )}
         </Card>
 
         {/* Main Form */}
-        <Card className="p-6 shadow-card">
+        <Card className="p-8 shadow-elegant border-2 border-primary/10">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-primary flex items-center gap-3">
+              <div className="w-1 h-8 bg-primary rounded-full"></div>
+              بيانات الطالب والخطة
+            </h2>
+          </div>
+          
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Student Name */}
-            <div>
-              <Label htmlFor="studentName" className="text-base">
+            <div className="space-y-2">
+              <Label htmlFor="studentName" className="text-base font-semibold flex items-center gap-2">
+                <span className="text-primary">●</span>
                 اسم الطالب <span className="text-destructive">*</span>
               </Label>
               <Input
@@ -284,14 +312,16 @@ const StudentPlanForm = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, studentName: e.target.value })
                 }
-                placeholder="أدخل اسم الطالب"
-                className="mt-2"
+                placeholder="أدخل اسم الطالب الكامل"
+                className="mt-2 h-12 text-base border-2 focus:border-primary"
+                required
               />
             </div>
 
             {/* Group */}
-            <div>
-              <Label htmlFor="group" className="text-base">
+            <div className="space-y-2">
+              <Label htmlFor="group" className="text-base font-semibold flex items-center gap-2">
+                <span className="text-primary">●</span>
                 المجموعة <span className="text-destructive">*</span>
               </Label>
               <Select
@@ -300,28 +330,25 @@ const StudentPlanForm = () => {
                   setFormData({ ...formData, group: value })
                 }
                 disabled={isLoadingData || groups.length === 0}
+                required
               >
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="اختر المجموعة" />
+                <SelectTrigger className="mt-2 h-12 text-base border-2 focus:border-primary">
+                  <SelectValue placeholder={groups.length === 0 ? "جاري التحميل..." : "اختر المجموعة"} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover">
                   {groups.map((group) => (
-                    <SelectItem key={group} value={group}>
+                    <SelectItem key={group} value={group} className="text-base">
                       {group}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {groups.length === 0 && (
-                <p className="text-sm text-destructive mt-1">
-                  الرجاء إدخال رابط webhook أولاً
-                </p>
-              )}
             </div>
 
             {/* Plan Type */}
-            <div>
-              <Label htmlFor="planType" className="text-base">
+            <div className="space-y-2">
+              <Label htmlFor="planType" className="text-base font-semibold flex items-center gap-2">
+                <span className="text-primary">●</span>
                 نوع الخطة <span className="text-destructive">*</span>
               </Label>
               <Select
@@ -330,13 +357,14 @@ const StudentPlanForm = () => {
                   setFormData({ ...formData, planType: value })
                 }
                 disabled={isLoadingData || !formData.group || planTypes.length === 0}
+                required
               >
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="اختر نوع الخطة" />
+                <SelectTrigger className="mt-2 h-12 text-base border-2 focus:border-primary">
+                  <SelectValue placeholder={!formData.group ? "اختر المجموعة أولاً" : planTypes.length === 0 ? "جاري التحميل..." : "اختر نوع الخطة"} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover">
                   {planTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
+                    <SelectItem key={type} value={type} className="text-base">
                       {type}
                     </SelectItem>
                   ))}
@@ -345,8 +373,9 @@ const StudentPlanForm = () => {
             </div>
 
             {/* Plan Element */}
-            <div>
-              <Label htmlFor="planElement" className="text-base">
+            <div className="space-y-2">
+              <Label htmlFor="planElement" className="text-base font-semibold flex items-center gap-2">
+                <span className="text-primary">●</span>
                 عنصر الخطة <span className="text-destructive">*</span>
               </Label>
               <Select
@@ -355,13 +384,14 @@ const StudentPlanForm = () => {
                   setFormData({ ...formData, planElement: value })
                 }
                 disabled={isLoadingData || !formData.planType || planElements.length === 0}
+                required
               >
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="اختر عنصر الخطة" />
+                <SelectTrigger className="mt-2 h-12 text-base border-2 focus:border-primary">
+                  <SelectValue placeholder={!formData.planType ? "اختر نوع الخطة أولاً" : planElements.length === 0 ? "جاري التحميل..." : "اختر عنصر الخطة"} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover">
                   {planElements.map((element) => (
-                    <SelectItem key={element} value={element}>
+                    <SelectItem key={element} value={element} className="text-base">
                       {element}
                     </SelectItem>
                   ))}
@@ -370,60 +400,69 @@ const StudentPlanForm = () => {
             </div>
 
             {/* Days */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="day1" className="text-base">
-                  اليوم الأول <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={formData.day1}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, day1: value })
-                  }
-                >
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="اختر اليوم الأول" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {days.map((day) => (
-                      <SelectItem key={day} value={day}>
-                        {day}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-4">
+              <Label className="text-base font-semibold flex items-center gap-2">
+                <span className="text-primary">●</span>
+                أيام الدراسة <span className="text-destructive">*</span>
+              </Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="day1" className="text-sm text-muted-foreground">
+                    اليوم الأول
+                  </Label>
+                  <Select
+                    value={formData.day1}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, day1: value })
+                    }
+                    required
+                  >
+                    <SelectTrigger className="h-12 text-base border-2 focus:border-primary">
+                      <SelectValue placeholder="اختر اليوم الأول" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover">
+                      {days.map((day) => (
+                        <SelectItem key={day} value={day} className="text-base">
+                          {day}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div>
-                <Label htmlFor="day2" className="text-base">
-                  اليوم الثاني <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={formData.day2}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, day2: value })
-                  }
-                >
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="اختر اليوم الثاني" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {days.map((day) => (
-                      <SelectItem key={day} value={day}>
-                        {day}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <Label htmlFor="day2" className="text-sm text-muted-foreground">
+                    اليوم الثاني
+                  </Label>
+                  <Select
+                    value={formData.day2}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, day2: value })
+                    }
+                    required
+                  >
+                    <SelectTrigger className="h-12 text-base border-2 focus:border-primary">
+                      <SelectValue placeholder="اختر اليوم الثاني" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover">
+                      {days.map((day) => (
+                        <SelectItem key={day} value={day} className="text-base">
+                          {day}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
             {/* Start Date */}
-            <div>
-              <Label className="text-base">
+            <div className="space-y-2">
+              <Label className="text-base font-semibold flex items-center gap-2">
+                <span className="text-primary">●</span>
                 تاريخ بدء الخطة <span className="text-destructive">*</span>
               </Label>
-              <div className="grid grid-cols-3 gap-4 mt-2">
+              <div className="grid grid-cols-3 gap-3 mt-2">
                 <div>
                   <Input
                     type="number"
@@ -434,6 +473,8 @@ const StudentPlanForm = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, startDay: e.target.value })
                     }
+                    className="h-12 text-base border-2 focus:border-primary text-center"
+                    required
                   />
                 </div>
                 <div>
@@ -446,6 +487,8 @@ const StudentPlanForm = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, startMonth: e.target.value })
                     }
+                    className="h-12 text-base border-2 focus:border-primary text-center"
+                    required
                   />
                 </div>
                 <div>
@@ -458,14 +501,17 @@ const StudentPlanForm = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, startYear: e.target.value })
                     }
+                    className="h-12 text-base border-2 focus:border-primary text-center"
+                    required
                   />
                 </div>
               </div>
             </div>
 
             {/* Plan Days */}
-            <div>
-              <Label htmlFor="planDays" className="text-base">
+            <div className="space-y-2">
+              <Label htmlFor="planDays" className="text-base font-semibold flex items-center gap-2">
+                <span className="text-primary">●</span>
                 عدد أيام الخطة <span className="text-destructive">*</span>
               </Label>
               <Input
@@ -476,42 +522,70 @@ const StudentPlanForm = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, planDays: e.target.value })
                 }
-                placeholder="أدخل عدد الأيام"
-                className="mt-2"
+                placeholder="مثال: 30 يوم"
+                className="mt-2 h-12 text-base border-2 focus:border-primary"
+                required
               />
+            </div>
+
+            {/* Divider */}
+            <div className="pt-4">
+              <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
             </div>
 
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full gradient-primary text-lg py-6"
+              className="w-full gradient-primary text-lg py-7 shadow-elegant hover:shadow-xl transition-all duration-300 text-primary-foreground font-bold"
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="ml-2 h-5 w-5 animate-spin" />
-                  جاري الإرسال...
+                  <Loader2 className="ml-2 h-6 w-6 animate-spin" />
+                  جاري الإرسال والمعالجة...
                 </>
               ) : (
                 <>
-                  <Send className="ml-2 h-5 w-5" />
-                  إرسال البيانات
+                  <Send className="ml-2 h-6 w-6" />
+                  إرسال وحفظ البيانات
                 </>
               )}
             </Button>
+            
+            {/* Success Message Hint */}
+            <p className="text-center text-sm text-muted-foreground mt-2">
+              سيتم إرسال البيانات إلى Google Sheets تلقائياً
+            </p>
           </form>
         </Card>
 
-        {/* Instructions */}
-        <Card className="p-6 bg-muted/50">
-          <h3 className="font-bold text-lg mb-3">تعليمات الاستخدام:</h3>
-          <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
-            <li>قم بإدخال روابط n8n webhooks في الأعلى</li>
-            <li>سيتم تحميل المجموعات تلقائياً</li>
-            <li>عند اختيار المجموعة، سيتم تحميل أنواع الخطط</li>
-            <li>عند اختيار نوع الخطة، سيتم تحميل عناصر الخطة</li>
-            <li>املأ باقي الحقول ثم اضغط إرسال</li>
-          </ol>
+        {/* Technical Info Card */}
+        <Card className="p-6 bg-muted/30 border-2 border-muted">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-secondary/10 rounded-xl">
+              <svg className="w-5 h-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-base mb-2 text-foreground">ملاحظات تقنية</h3>
+              <ul className="space-y-1.5 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="text-secondary mt-0.5">•</span>
+                  <span>النظام متصل بـ Google Sheets عبر n8n automation</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-secondary mt-0.5">•</span>
+                  <span>جميع البيانات يتم حفظها تلقائياً بعد الإرسال</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-secondary mt-0.5">•</span>
+                  <span>القوائم المنسدلة يتم تحديثها ديناميكياً من الملف</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </Card>
       </div>
     </div>
