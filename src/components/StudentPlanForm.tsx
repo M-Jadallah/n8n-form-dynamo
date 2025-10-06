@@ -41,7 +41,7 @@ const StudentPlanForm = () => {
 
   // إعدادات n8n مخزنة مباشرة في الكود
   const n8nConfig: N8nConfig = {
-    webhookUrl: "https://n8n.jadallah.work/webhook-test/get-form-data",
+    webhookUrl: "https://n8n.jadallah.work/webhook/get-form-data",
     dataWebhookUrl: "https://n8n.jadallah.work/webhook/get-data-form",
   };
 
