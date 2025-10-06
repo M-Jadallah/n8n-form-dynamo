@@ -40,8 +40,8 @@ const StudentPlanForm = () => {
   });
 
   const [n8nConfig, setN8nConfig] = useState<N8nConfig>({
-    webhookUrl: "",
-    dataWebhookUrl: "",
+    webhookUrl: "https://n8n.jadallah.work/webhook-test/get-form-data",
+    dataWebhookUrl: "https://n8n.jadallah.work/webhook/get-data-form",
   });
 
   const [groups, setGroups] = useState<string[]>([]);
