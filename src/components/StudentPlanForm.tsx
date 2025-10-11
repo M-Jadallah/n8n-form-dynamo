@@ -10,6 +10,7 @@ import { Loader2, Send, FileText } from "lucide-react";
 interface FormData {
   studentName: string;
   group: string;
+  center: string;
   planType: string;
   planElement: string;
   day1: string;
@@ -29,6 +30,7 @@ const StudentPlanForm = () => {
   const [formData, setFormData] = useState<FormData>({
     studentName: "",
     group: "",
+    center: "",
     planType: "",
     planElement: "",
     day1: "",
@@ -46,6 +48,7 @@ const StudentPlanForm = () => {
   };
 
   const [groups, setGroups] = useState<string[]>([]);
+  const [centers, setCenters] = useState<string[]>([]);
   const [planTypes, setPlanTypes] = useState<string[]>([]);
   const [planElements, setPlanElements] = useState<string[]>([]);
   const [days] = useState<string[]>([
@@ -68,12 +71,19 @@ const StudentPlanForm = () => {
     }
   }, [n8nConfig.webhookUrl]);
 
-  // Load plan types when group changes
+  // Load centers when group changes
   useEffect(() => {
     if (formData.group && n8nConfig.webhookUrl) {
-      loadPlanTypes();
+      loadCenters();
     }
   }, [formData.group, n8nConfig.webhookUrl]);
+
+  // Load plan types when center changes
+  useEffect(() => {
+    if (formData.center && n8nConfig.webhookUrl) {
+      loadPlanTypes();
+    }
+  }, [formData.center, n8nConfig.webhookUrl]);
 
   // Load plan elements when plan type changes
   useEffect(() => {
@@ -85,7 +95,6 @@ const StudentPlanForm = () => {
   const loadGroups = async () => {
     try {
       setIsLoadingData(true);
-      // Google Apps Script يحتاج GET request مع query parameters
       const url = new URL(n8nConfig.webhookUrl);
       url.searchParams.append('action', 'getGroups');
       
@@ -96,7 +105,6 @@ const StudentPlanForm = () => {
       const data = await response.json();
       console.log("Groups response:", data);
       
-      // التأكد من أن البيانات array
       const groupsData = Array.isArray(data.groups) ? data.groups : 
                          Array.isArray(data) ? data : [];
       setGroups(groupsData);
@@ -109,13 +117,39 @@ const StudentPlanForm = () => {
     }
   };
 
+  const loadCenters = async () => {
+    try {
+      setIsLoadingData(true);
+      const url = new URL(n8nConfig.webhookUrl);
+      url.searchParams.append('action', 'getCenters');
+      url.searchParams.append('group', formData.group);
+      
+      const response = await fetch(url.toString(), {
+        method: "GET",
+      });
+      
+      const data = await response.json();
+      console.log("Centers response:", data);
+      
+      const centersData = Array.isArray(data.centers) ? data.centers : 
+                          Array.isArray(data) ? data : [];
+      setCenters(centersData);
+      setFormData(prev => ({ ...prev, center: "", planType: "", planElement: "" }));
+    } catch (error) {
+      console.error("Error loading centers:", error);
+      toast.error("خطأ في تحميل المراكز");
+      setCenters([]);
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
+
   const loadPlanTypes = async () => {
     try {
       setIsLoadingData(true);
-      // Google Apps Script يحتاج GET request مع query parameters
       const url = new URL(n8nConfig.webhookUrl);
       url.searchParams.append('action', 'getPlanTypes');
-      url.searchParams.append('group', formData.group);
+      url.searchParams.append('center', formData.center);
       
       const response = await fetch(url.toString(), {
         method: "GET",
@@ -124,7 +158,6 @@ const StudentPlanForm = () => {
       const data = await response.json();
       console.log("Plan types response:", data);
       
-      // التأكد من أن البيانات array
       const planTypesData = Array.isArray(data.planTypes) ? data.planTypes : 
                             Array.isArray(data) ? data : [];
       setPlanTypes(planTypesData);
@@ -141,7 +174,6 @@ const StudentPlanForm = () => {
   const loadPlanElements = async () => {
     try {
       setIsLoadingData(true);
-      // Google Apps Script يحتاج GET request مع query parameters
       const url = new URL(n8nConfig.webhookUrl);
       url.searchParams.append('action', 'getPlanElements');
       url.searchParams.append('planType', formData.planType);
@@ -153,7 +185,6 @@ const StudentPlanForm = () => {
       const data = await response.json();
       console.log("Plan elements response:", data);
       
-      // التأكد من أن البيانات array
       const planElementsData = Array.isArray(data.planElements) ? data.planElements : 
                                Array.isArray(data) ? data : [];
       setPlanElements(planElementsData);
@@ -175,8 +206,7 @@ const StudentPlanForm = () => {
       return;
     }
 
-    // Validation
-    if (!formData.studentName || !formData.group || !formData.planType || 
+    if (!formData.studentName || !formData.group || !formData.center || !formData.planType || 
         !formData.planElement || !formData.day1 || !formData.day2 ||
         !formData.startDay || !formData.startMonth || !formData.startYear ||
         !formData.planDays) {
@@ -193,6 +223,7 @@ const StudentPlanForm = () => {
         body: JSON.stringify({
           studentName: formData.studentName,
           group: formData.group,
+          center: formData.center,
           planType: formData.planType,
           planElement: formData.planElement,
           days: [formData.day1, formData.day2],
@@ -204,10 +235,10 @@ const StudentPlanForm = () => {
 
       if (response.ok) {
         toast.success("تم إرسال البيانات بنجاح!");
-        // Reset form
         setFormData({
           studentName: "",
           group: "",
+          center: "",
           planType: "",
           planElement: "",
           day1: "",
@@ -231,7 +262,7 @@ const StudentPlanForm = () => {
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-5xl mx-auto space-y-8">
-        {/* Header with gradient background */}
+        {/* Header */}
         <div className="text-center space-y-4 py-12 relative overflow-hidden">
           <div className="absolute inset-0 gradient-primary opacity-5 rounded-3xl"></div>
           <div className="relative">
@@ -249,7 +280,7 @@ const StudentPlanForm = () => {
           </div>
         </div>
 
-        {/* Instructions Card - Enhanced */}
+        {/* Instructions Card */}
         <Card className="p-8 gradient-card border-2 border-primary/10 shadow-elegant">
           <div className="flex items-start gap-4 mb-6">
             <div className="p-3 bg-primary/10 rounded-xl">
@@ -264,19 +295,19 @@ const StudentPlanForm = () => {
                   <div className="flex items-start gap-3">
                     <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">1</span>
                     <p className="text-muted-foreground leading-relaxed">
-                      <strong className="text-foreground">اختر المجموعة:</strong> سيتم تحميل المجموعات تلقائياً من Google Sheets
+                      <strong className="text-foreground">اختر المجموعة:</strong> سيتم تحميل المجموعات تلقائياً
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">2</span>
                     <p className="text-muted-foreground leading-relaxed">
-                      <strong className="text-foreground">نوع الخطة:</strong> اختر نوع الخطة المناسبة للطالب
+                      <strong className="text-foreground">اختر المركز:</strong> حدد المركز المطلوب
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">3</span>
                     <p className="text-muted-foreground leading-relaxed">
-                      <strong className="text-foreground">عنصر الخطة:</strong> حدد العنصر المطلوب من القائمة
+                      <strong className="text-foreground">نوع الخطة:</strong> اختر نوع الخطة المناسبة
                     </p>
                   </div>
                 </div>
@@ -284,13 +315,13 @@ const StudentPlanForm = () => {
                   <div className="flex items-start gap-3">
                     <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">4</span>
                     <p className="text-muted-foreground leading-relaxed">
-                      <strong className="text-foreground">أيام الدراسة:</strong> اختر اليومين المخصصين للطالب
+                      <strong className="text-foreground">عنصر الخطة:</strong> حدد العنصر المطلوب
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">5</span>
                     <p className="text-muted-foreground leading-relaxed">
-                      <strong className="text-foreground">تاريخ البدء:</strong> حدد تاريخ بداية تنفيذ الخطة
+                      <strong className="text-foreground">أيام الدراسة:</strong> اختر اليومين المخصصين
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
@@ -304,7 +335,6 @@ const StudentPlanForm = () => {
             </div>
           </div>
           
-          {/* Loading Indicator */}
           {isLoadingData && (
             <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-lg flex items-center gap-3">
               <Loader2 className="w-5 h-5 text-primary animate-spin" />
@@ -358,10 +388,37 @@ const StudentPlanForm = () => {
                 <SelectTrigger className="mt-2 h-12 text-base border-2 focus:border-primary">
                   <SelectValue placeholder={groups.length === 0 ? "جاري التحميل..." : "اختر المجموعة"} />
                 </SelectTrigger>
-                <SelectContent className="bg-popover">
+                <SelectContent className="bg-popover z-50">
                   {groups.map((group) => (
                     <SelectItem key={group} value={group} className="text-base">
                       {group}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Center */}
+            <div className="space-y-2">
+              <Label htmlFor="center" className="text-base font-semibold flex items-center gap-2">
+                <span className="text-primary">●</span>
+                المركز المطلوب <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={formData.center}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, center: value })
+                }
+                disabled={isLoadingData || !formData.group || centers.length === 0}
+                required
+              >
+                <SelectTrigger className="mt-2 h-12 text-base border-2 focus:border-primary">
+                  <SelectValue placeholder={!formData.group ? "اختر المجموعة أولاً" : centers.length === 0 ? "جاري التحميل..." : "اختر المركز"} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  {centers.map((center) => (
+                    <SelectItem key={center} value={center} className="text-base">
+                      {center}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -379,13 +436,13 @@ const StudentPlanForm = () => {
                 onValueChange={(value) =>
                   setFormData({ ...formData, planType: value })
                 }
-                disabled={isLoadingData || !formData.group || planTypes.length === 0}
+                disabled={isLoadingData || !formData.center || planTypes.length === 0}
                 required
               >
                 <SelectTrigger className="mt-2 h-12 text-base border-2 focus:border-primary">
-                  <SelectValue placeholder={!formData.group ? "اختر المجموعة أولاً" : planTypes.length === 0 ? "جاري التحميل..." : "اختر نوع الخطة"} />
+                  <SelectValue placeholder={!formData.center ? "اختر المركز أولاً" : planTypes.length === 0 ? "جاري التحميل..." : "اختر نوع الخطة"} />
                 </SelectTrigger>
-                <SelectContent className="bg-popover">
+                <SelectContent className="bg-popover z-50">
                   {planTypes.map((type) => (
                     <SelectItem key={type} value={type} className="text-base">
                       {type}
@@ -412,7 +469,7 @@ const StudentPlanForm = () => {
                 <SelectTrigger className="mt-2 h-12 text-base border-2 focus:border-primary">
                   <SelectValue placeholder={!formData.planType ? "اختر نوع الخطة أولاً" : planElements.length === 0 ? "جاري التحميل..." : "اختر عنصر الخطة"} />
                 </SelectTrigger>
-                <SelectContent className="bg-popover">
+                <SelectContent className="bg-popover z-50">
                   {planElements.map((element) => (
                     <SelectItem key={element} value={element} className="text-base">
                       {element}
@@ -443,7 +500,7 @@ const StudentPlanForm = () => {
                     <SelectTrigger className="h-12 text-base border-2 focus:border-primary">
                       <SelectValue placeholder="اختر اليوم الأول" />
                     </SelectTrigger>
-                    <SelectContent className="bg-popover">
+                    <SelectContent className="bg-popover z-50">
                       {days.map((day) => (
                         <SelectItem key={day} value={day} className="text-base">
                           {day}
@@ -452,7 +509,6 @@ const StudentPlanForm = () => {
                     </SelectContent>
                   </Select>
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="day2" className="text-sm text-muted-foreground">
                     اليوم الثاني
@@ -467,7 +523,7 @@ const StudentPlanForm = () => {
                     <SelectTrigger className="h-12 text-base border-2 focus:border-primary">
                       <SelectValue placeholder="اختر اليوم الثاني" />
                     </SelectTrigger>
-                    <SelectContent className="bg-popover">
+                    <SelectContent className="bg-popover z-50">
                       {days.map((day) => (
                         <SelectItem key={day} value={day} className="text-base">
                           {day}
@@ -480,51 +536,62 @@ const StudentPlanForm = () => {
             </div>
 
             {/* Start Date */}
-            <div className="space-y-2">
+            <div className="space-y-4">
               <Label className="text-base font-semibold flex items-center gap-2">
                 <span className="text-primary">●</span>
-                تاريخ بدء الخطة <span className="text-destructive">*</span>
+                تاريخ بداية تنفيذ الخطة <span className="text-destructive">*</span>
               </Label>
-              <div className="grid grid-cols-3 gap-3 mt-2">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="startDay" className="text-sm text-muted-foreground">
+                    اليوم
+                  </Label>
                   <Input
+                    id="startDay"
                     type="number"
-                    placeholder="اليوم"
                     min="1"
                     max="31"
                     value={formData.startDay}
                     onChange={(e) =>
                       setFormData({ ...formData, startDay: e.target.value })
                     }
-                    className="h-12 text-base border-2 focus:border-primary text-center"
+                    placeholder="1-31"
+                    className="h-12 text-base border-2 focus:border-primary"
                     required
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
+                  <Label htmlFor="startMonth" className="text-sm text-muted-foreground">
+                    الشهر
+                  </Label>
                   <Input
+                    id="startMonth"
                     type="number"
-                    placeholder="الشهر"
                     min="1"
                     max="12"
                     value={formData.startMonth}
                     onChange={(e) =>
                       setFormData({ ...formData, startMonth: e.target.value })
                     }
-                    className="h-12 text-base border-2 focus:border-primary text-center"
+                    placeholder="1-12"
+                    className="h-12 text-base border-2 focus:border-primary"
                     required
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
+                  <Label htmlFor="startYear" className="text-sm text-muted-foreground">
+                    السنة
+                  </Label>
                   <Input
+                    id="startYear"
                     type="number"
-                    placeholder="السنة"
-                    min="2020"
-                    max="2100"
+                    min="2024"
                     value={formData.startYear}
                     onChange={(e) =>
                       setFormData({ ...formData, startYear: e.target.value })
                     }
-                    className="h-12 text-base border-2 focus:border-primary text-center"
+                    placeholder="2024"
+                    className="h-12 text-base border-2 focus:border-primary"
                     required
                   />
                 </div>
@@ -545,70 +612,47 @@ const StudentPlanForm = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, planDays: e.target.value })
                 }
-                placeholder="مثال: 30 يوم"
+                placeholder="أدخل عدد أيام الخطة"
                 className="mt-2 h-12 text-base border-2 focus:border-primary"
                 required
               />
             </div>
 
-            {/* Divider */}
-            <div className="pt-4">
-              <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
-            </div>
-
             {/* Submit Button */}
-            <Button
-              type="submit"
-              className="w-full gradient-primary text-lg py-7 shadow-elegant hover:shadow-xl transition-all duration-300 text-primary-foreground font-bold"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="ml-2 h-6 w-6 animate-spin" />
-                  جاري الإرسال والمعالجة...
-                </>
-              ) : (
-                <>
-                  <Send className="ml-2 h-6 w-6" />
-                  إرسال وحفظ البيانات
-                </>
-              )}
-            </Button>
-            
-            {/* Success Message Hint */}
-            <p className="text-center text-sm text-muted-foreground mt-2">
-              سيتم إرسال البيانات إلى Google Sheets تلقائياً
-            </p>
+            <div className="pt-6">
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-14 text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="ml-2 h-6 w-6 animate-spin" />
+                    جاري الإرسال...
+                  </>
+                ) : (
+                  <>
+                    <Send className="ml-2 h-6 w-6" />
+                    إرسال البيانات
+                  </>
+                )}
+              </Button>
+              <p className="text-center text-sm text-muted-foreground mt-3">
+                سيتم حفظ البيانات وإرسالها تلقائياً إلى النظام
+              </p>
+            </div>
           </form>
         </Card>
 
-        {/* Technical Info Card */}
-        <Card className="p-6 bg-muted/30 border-2 border-muted">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-secondary/10 rounded-xl">
-              <svg className="w-5 h-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-base mb-2 text-foreground">ملاحظات تقنية</h3>
-              <ul className="space-y-1.5 text-sm text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <span className="text-secondary mt-0.5">•</span>
-                  <span>النظام متصل بـ Google Sheets عبر n8n automation</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-secondary mt-0.5">•</span>
-                  <span>جميع البيانات يتم حفظها تلقائياً بعد الإرسال</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-secondary mt-0.5">•</span>
-                  <span>القوائم المنسدلة يتم تحديثها ديناميكياً من الملف</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+        {/* Technical Info */}
+        <Card className="p-6 bg-muted/30 border border-primary/10">
+          <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+            ملاحظة فنية
+          </h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            النظام متصل تلقائياً بـ Google Sheets و n8n لمعالجة البيانات وحفظها بشكل آمن ومنظم
+          </p>
         </Card>
       </div>
     </div>
