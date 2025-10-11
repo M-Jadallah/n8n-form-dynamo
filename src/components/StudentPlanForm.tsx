@@ -39,10 +39,10 @@ const StudentPlanForm = () => {
     planDays: "",
   });
 
-  // إعدادات n8n مخزنة مباشرة في الكود
+  // إعدادات n8n و Google Apps Script مخزنة مباشرة في الكود
   const n8nConfig: N8nConfig = {
-    webhookUrl: "https://n8n.jadallah.work/webhook/get-form-data",
-    dataWebhookUrl: "https://n8n.jadallah.work/webhook/get-data-form",
+    webhookUrl: "https://script.google.com/macros/s/AKfycbwe1sABQ8QAjxiPFH9ydaVVLg3ztMTQU7nGUA01qmEcb5uQ8fn4JXH9POgfkBqkX9cL/exec",
+    dataWebhookUrl: "https://n8n.jadallah.work/webhook/formform",
   };
 
   const [groups, setGroups] = useState<string[]>([]);
