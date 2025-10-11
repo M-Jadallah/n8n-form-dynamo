@@ -85,13 +85,16 @@ const StudentPlanForm = () => {
   const loadGroups = async () => {
     try {
       setIsLoadingData(true);
-      const response = await fetch(n8nConfig.webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "getGroups" }),
+      // Google Apps Script يحتاج GET request مع query parameters
+      const url = new URL(n8nConfig.webhookUrl);
+      url.searchParams.append('action', 'getGroups');
+      
+      const response = await fetch(url.toString(), {
+        method: "GET",
       });
       
       const data = await response.json();
+      console.log("Groups data:", data);
       setGroups(data.groups || []);
     } catch (error) {
       console.error("Error loading groups:", error);
@@ -104,13 +107,17 @@ const StudentPlanForm = () => {
   const loadPlanTypes = async () => {
     try {
       setIsLoadingData(true);
-      const response = await fetch(n8nConfig.webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "getPlanTypes", group: formData.group }),
+      // Google Apps Script يحتاج GET request مع query parameters
+      const url = new URL(n8nConfig.webhookUrl);
+      url.searchParams.append('action', 'getPlanTypes');
+      url.searchParams.append('group', formData.group);
+      
+      const response = await fetch(url.toString(), {
+        method: "GET",
       });
       
       const data = await response.json();
+      console.log("Plan types data:", data);
       setPlanTypes(data.planTypes || []);
       setFormData(prev => ({ ...prev, planType: "", planElement: "" }));
     } catch (error) {
@@ -124,16 +131,17 @@ const StudentPlanForm = () => {
   const loadPlanElements = async () => {
     try {
       setIsLoadingData(true);
-      const response = await fetch(n8nConfig.webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          action: "getPlanElements", 
-          planType: formData.planType 
-        }),
+      // Google Apps Script يحتاج GET request مع query parameters
+      const url = new URL(n8nConfig.webhookUrl);
+      url.searchParams.append('action', 'getPlanElements');
+      url.searchParams.append('planType', formData.planType);
+      
+      const response = await fetch(url.toString(), {
+        method: "GET",
       });
       
       const data = await response.json();
+      console.log("Plan elements data:", data);
       setPlanElements(data.planElements || []);
       setFormData(prev => ({ ...prev, planElement: "" }));
     } catch (error) {
