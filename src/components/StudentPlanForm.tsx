@@ -94,11 +94,16 @@ const StudentPlanForm = () => {
       });
       
       const data = await response.json();
-      console.log("Groups data:", data);
-      setGroups(data.groups || []);
+      console.log("Groups response:", data);
+      
+      // التأكد من أن البيانات array
+      const groupsData = Array.isArray(data.groups) ? data.groups : 
+                         Array.isArray(data) ? data : [];
+      setGroups(groupsData);
     } catch (error) {
       console.error("Error loading groups:", error);
       toast.error("خطأ في تحميل المجموعات");
+      setGroups([]);
     } finally {
       setIsLoadingData(false);
     }
@@ -117,12 +122,17 @@ const StudentPlanForm = () => {
       });
       
       const data = await response.json();
-      console.log("Plan types data:", data);
-      setPlanTypes(data.planTypes || []);
+      console.log("Plan types response:", data);
+      
+      // التأكد من أن البيانات array
+      const planTypesData = Array.isArray(data.planTypes) ? data.planTypes : 
+                            Array.isArray(data) ? data : [];
+      setPlanTypes(planTypesData);
       setFormData(prev => ({ ...prev, planType: "", planElement: "" }));
     } catch (error) {
       console.error("Error loading plan types:", error);
       toast.error("خطأ في تحميل أنواع الخطط");
+      setPlanTypes([]);
     } finally {
       setIsLoadingData(false);
     }
@@ -141,12 +151,17 @@ const StudentPlanForm = () => {
       });
       
       const data = await response.json();
-      console.log("Plan elements data:", data);
-      setPlanElements(data.planElements || []);
+      console.log("Plan elements response:", data);
+      
+      // التأكد من أن البيانات array
+      const planElementsData = Array.isArray(data.planElements) ? data.planElements : 
+                               Array.isArray(data) ? data : [];
+      setPlanElements(planElementsData);
       setFormData(prev => ({ ...prev, planElement: "" }));
     } catch (error) {
       console.error("Error loading plan elements:", error);
       toast.error("خطأ في تحميل عناصر الخطة");
+      setPlanElements([]);
     } finally {
       setIsLoadingData(false);
     }
