@@ -43,7 +43,7 @@ const StudentPlanForm = () => {
 
   // إعدادات n8n و Google Apps Script مخزنة مباشرة في الكود
   const n8nConfig: N8nConfig = {
-    webhookUrl: "https://script.google.com/macros/s/AKfycbwe1sABQ8QAjxiPFH9ydaVVLg3ztMTQU7nGUA01qmEcb5uQ8fn4JXH9POgfkBqkX9cL/exec",
+    webhookUrl: "https://script.google.com/macros/s/AKfycbxSG0v4_ivnETCWXsbCbvzYcKNySJsYWIbHEj-tCgj2sEgA0MrpsVLFyqXlnXAvhduv/exec",
     dataWebhookUrl: "https://n8n.jadallah.work/webhook/formform",
   };
 
