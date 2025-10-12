@@ -9,8 +9,8 @@ import { Loader2, Send, FileText } from "lucide-react";
 
 interface FormData {
   studentName: string;
-  group: string;
   center: string;
+  group: string;
   planType: string;
   planElement: string;
   day1: string;
@@ -29,8 +29,8 @@ interface N8nConfig {
 const StudentPlanForm = () => {
   const [formData, setFormData] = useState<FormData>({
     studentName: "",
-    group: "",
     center: "",
+    group: "",
     planType: "",
     planElement: "",
     day1: "",
@@ -47,8 +47,8 @@ const StudentPlanForm = () => {
     dataWebhookUrl: "https://n8n.jadallah.work/webhook/formform",
   };
 
-  const [groups, setGroups] = useState<string[]>([]);
   const [centers, setCenters] = useState<string[]>([]);
+  const [groups, setGroups] = useState<string[]>([]);
   const [planTypes, setPlanTypes] = useState<string[]>([]);
   const [planElements, setPlanElements] = useState<string[]>([]);
   const [days] = useState<string[]>([
@@ -64,26 +64,26 @@ const StudentPlanForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(false);
 
-  // Load groups on component mount
+  // Load centers on component mount
   useEffect(() => {
     if (n8nConfig.webhookUrl) {
-      loadGroups();
+      loadCenters();
     }
   }, [n8nConfig.webhookUrl]);
 
-  // Load centers when group changes
-  useEffect(() => {
-    if (formData.group && n8nConfig.webhookUrl) {
-      loadCenters();
-    }
-  }, [formData.group, n8nConfig.webhookUrl]);
-
-  // Load plan types when center changes
+  // Load groups when center changes
   useEffect(() => {
     if (formData.center && n8nConfig.webhookUrl) {
-      loadPlanTypes();
+      loadGroups();
     }
   }, [formData.center, n8nConfig.webhookUrl]);
+
+  // Load plan types when group changes
+  useEffect(() => {
+    if (formData.group && n8nConfig.webhookUrl) {
+      loadPlanTypes();
+    }
+  }, [formData.group, n8nConfig.webhookUrl]);
 
   // Load plan elements when plan type changes
   useEffect(() => {
@@ -92,37 +92,11 @@ const StudentPlanForm = () => {
     }
   }, [formData.planType, n8nConfig.webhookUrl]);
 
-  const loadGroups = async () => {
-    try {
-      setIsLoadingData(true);
-      const url = new URL(n8nConfig.webhookUrl);
-      url.searchParams.append('action', 'getGroups');
-      
-      const response = await fetch(url.toString(), {
-        method: "GET",
-      });
-      
-      const data = await response.json();
-      console.log("Groups response:", data);
-      
-      const groupsData = Array.isArray(data.groups) ? data.groups : 
-                         Array.isArray(data) ? data : [];
-      setGroups(groupsData);
-    } catch (error) {
-      console.error("Error loading groups:", error);
-      toast.error("خطأ في تحميل المجموعات");
-      setGroups([]);
-    } finally {
-      setIsLoadingData(false);
-    }
-  };
-
   const loadCenters = async () => {
     try {
       setIsLoadingData(true);
       const url = new URL(n8nConfig.webhookUrl);
       url.searchParams.append('action', 'getCenters');
-      url.searchParams.append('group', formData.group);
       
       const response = await fetch(url.toString(), {
         method: "GET",
@@ -134,11 +108,37 @@ const StudentPlanForm = () => {
       const centersData = Array.isArray(data.centers) ? data.centers : 
                           Array.isArray(data) ? data : [];
       setCenters(centersData);
-      setFormData(prev => ({ ...prev, center: "", planType: "", planElement: "" }));
     } catch (error) {
       console.error("Error loading centers:", error);
       toast.error("خطأ في تحميل المراكز");
       setCenters([]);
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
+
+  const loadGroups = async () => {
+    try {
+      setIsLoadingData(true);
+      const url = new URL(n8nConfig.webhookUrl);
+      url.searchParams.append('action', 'getGroups');
+      url.searchParams.append('center', formData.center);
+      
+      const response = await fetch(url.toString(), {
+        method: "GET",
+      });
+      
+      const data = await response.json();
+      console.log("Groups response:", data);
+      
+      const groupsData = Array.isArray(data.groups) ? data.groups : 
+                         Array.isArray(data) ? data : [];
+      setGroups(groupsData);
+      setFormData(prev => ({ ...prev, group: "", planType: "", planElement: "" }));
+    } catch (error) {
+      console.error("Error loading groups:", error);
+      toast.error("خطأ في تحميل المجموعات");
+      setGroups([]);
     } finally {
       setIsLoadingData(false);
     }
@@ -149,7 +149,7 @@ const StudentPlanForm = () => {
       setIsLoadingData(true);
       const url = new URL(n8nConfig.webhookUrl);
       url.searchParams.append('action', 'getPlanTypes');
-      url.searchParams.append('center', formData.center);
+      url.searchParams.append('group', formData.group);
       
       const response = await fetch(url.toString(), {
         method: "GET",
@@ -206,7 +206,7 @@ const StudentPlanForm = () => {
       return;
     }
 
-    if (!formData.studentName || !formData.group || !formData.center || !formData.planType || 
+    if (!formData.studentName || !formData.center || !formData.group || !formData.planType || 
         !formData.planElement || !formData.day1 || !formData.day2 ||
         !formData.startDay || !formData.startMonth || !formData.startYear ||
         !formData.planDays) {
@@ -222,8 +222,8 @@ const StudentPlanForm = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           studentName: formData.studentName,
-          group: formData.group,
           center: formData.center,
+          group: formData.group,
           planType: formData.planType,
           planElement: formData.planElement,
           days: [formData.day1, formData.day2],
@@ -237,8 +237,8 @@ const StudentPlanForm = () => {
         toast.success("تم إرسال البيانات بنجاح!");
         setFormData({
           studentName: "",
-          group: "",
           center: "",
+          group: "",
           planType: "",
           planElement: "",
           day1: "",
@@ -295,13 +295,13 @@ const StudentPlanForm = () => {
                   <div className="flex items-start gap-3">
                     <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">1</span>
                     <p className="text-muted-foreground leading-relaxed">
-                      <strong className="text-foreground">اختر المجموعة:</strong> سيتم تحميل المجموعات تلقائياً
+                      <strong className="text-foreground">اختر المركز:</strong> سيتم تحميل المراكز تلقائياً
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0 mt-0.5">2</span>
                     <p className="text-muted-foreground leading-relaxed">
-                      <strong className="text-foreground">اختر المركز:</strong> حدد المركز المطلوب
+                      <strong className="text-foreground">اختر المجموعة:</strong> حدد المجموعة المطلوبة
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
@@ -371,33 +371,6 @@ const StudentPlanForm = () => {
               />
             </div>
 
-            {/* Group */}
-            <div className="space-y-2">
-              <Label htmlFor="group" className="text-base font-semibold flex items-center gap-2">
-                <span className="text-primary">●</span>
-                المجموعة <span className="text-destructive">*</span>
-              </Label>
-              <Select
-                value={formData.group}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, group: value })
-                }
-                disabled={isLoadingData || groups.length === 0}
-                required
-              >
-                <SelectTrigger className="mt-2 h-12 text-base border-2 focus:border-primary">
-                  <SelectValue placeholder={groups.length === 0 ? "جاري التحميل..." : "اختر المجموعة"} />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  {groups.map((group) => (
-                    <SelectItem key={group} value={group} className="text-base">
-                      {group}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Center */}
             <div className="space-y-2">
               <Label htmlFor="center" className="text-base font-semibold flex items-center gap-2">
@@ -409,16 +382,43 @@ const StudentPlanForm = () => {
                 onValueChange={(value) =>
                   setFormData({ ...formData, center: value })
                 }
-                disabled={isLoadingData || !formData.group || centers.length === 0}
+                disabled={isLoadingData || centers.length === 0}
                 required
               >
                 <SelectTrigger className="mt-2 h-12 text-base border-2 focus:border-primary">
-                  <SelectValue placeholder={!formData.group ? "اختر المجموعة أولاً" : centers.length === 0 ? "جاري التحميل..." : "اختر المركز"} />
+                  <SelectValue placeholder={centers.length === 0 ? "جاري التحميل..." : "اختر المركز"} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
                   {centers.map((center) => (
                     <SelectItem key={center} value={center} className="text-base">
                       {center}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Group */}
+            <div className="space-y-2">
+              <Label htmlFor="group" className="text-base font-semibold flex items-center gap-2">
+                <span className="text-primary">●</span>
+                المجموعة <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={formData.group}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, group: value })
+                }
+                disabled={isLoadingData || !formData.center || groups.length === 0}
+                required
+              >
+                <SelectTrigger className="mt-2 h-12 text-base border-2 focus:border-primary">
+                  <SelectValue placeholder={!formData.center ? "اختر المركز أولاً" : groups.length === 0 ? "جاري التحميل..." : "اختر المجموعة"} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  {groups.map((group) => (
+                    <SelectItem key={group} value={group} className="text-base">
+                      {group}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -436,11 +436,11 @@ const StudentPlanForm = () => {
                 onValueChange={(value) =>
                   setFormData({ ...formData, planType: value })
                 }
-                disabled={isLoadingData || !formData.center || planTypes.length === 0}
+                disabled={isLoadingData || !formData.group || planTypes.length === 0}
                 required
               >
                 <SelectTrigger className="mt-2 h-12 text-base border-2 focus:border-primary">
-                  <SelectValue placeholder={!formData.center ? "اختر المركز أولاً" : planTypes.length === 0 ? "جاري التحميل..." : "اختر نوع الخطة"} />
+                  <SelectValue placeholder={!formData.group ? "اختر المجموعة أولاً" : planTypes.length === 0 ? "جاري التحميل..." : "اختر نوع الخطة"} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
                   {planTypes.map((type) => (
